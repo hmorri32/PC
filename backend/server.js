@@ -4,8 +4,10 @@ const bodyParser = require('body-parser');
 const routes = require('./routes/index');
 const config = require('dotenv').config().parsed;
 
-app.set('port', process.env.PORT || 3000);
+const cors = require('cors');
 
+app.set('port', process.env.PORT || 3000);
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 

@@ -12,7 +12,7 @@ exports.up = function (knex) {
     table.float('Ch4');
     table.float('C2H6');
 
-    table.timestamps(true, true);
+    table.timestamps(false, false);
   });
 };
 
