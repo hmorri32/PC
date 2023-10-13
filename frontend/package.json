@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@turf/turf": "^6.5.0",
     "dotenv": "^16.3.1",
     "mapbox-gl": "^2.15.0",
     "react": "^18.2.0",
@@ -25,5 +26,6 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
     "vite": "^4.4.5"
-  }
+  },
+  "proxy": "http://localhost:3000"
 }
