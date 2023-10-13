@@ -1,0 +1,77 @@
+.controls {
+  background-color: rgba(70, 70, 70, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  /* background-clip: padding-box; */
+  padding: 1px;
+  position: absolute;
+  top: 110px;
+  right: 8px;
+  width: 29px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.controls .map-toggle-wrap:last-child {
+  margin-bottom: 0;
+}
+
+.map-toggle-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 30px;
+  /* margin: 0 0 10px 0; */
+  cursor: pointer;
+}
+
+.map-toggle-wrap:hover {
+  background-color: #9d0300;
+}
+
+.map-toggle-wrap:hover .map-type {
+  position: absolute;
+  left: -390%;
+  display: block;
+}
+
+.map-type {
+  position: relative;
+  padding: 5px;
+  display: none;
+  background-color: #9d0300;
+  box-shadow: 0 1px 1px 1px rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 0.9em;
+  width: 90px;
+}
+
+.arrow {
+  display: block;
+  position: absolute;
+  right: -9px;
+  top: 0;
+  bottom: 0;
+  height: 15px;
+  width: 15px;
+  margin: auto;
+}
+
+.map-btn {
+  display: block;
+  margin: 15px 0;
+  padding: 0;
+  background: transparent;
+  border-style: none;
+  outline: none;
+  width: 100%;
+}
+
+.map-toggle-btn {
+  display: block;
+  height: 20px;
+  width: 20px;
+  margin: 0 auto;
+  cursor: pointer;
+}
