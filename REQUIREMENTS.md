@@ -1,6 +1,7 @@
 Mapping coding exercise
 
 The goal of this exercise is to plot the locations of each record in data.csv file on a map and save a coverage polygon.
+
 Each point should have some visual indicator of the value. For example higher concentrations should be red and lower ones should be green.
 
 There should be a dropdown to choose between Ethane (C2H6) and Methane (Ch4).
@@ -18,9 +19,7 @@ Your backend should have 2 API calls
 The backend can be written in any language (C# preferred)
 Its strongly encouraged to use an ORM to generate your database table and to read the data in your API call.
 
-
 Please email back a zip file with all the code and instructions to run the app locally.
-
 
 1. The emissions observations are collected from our mobile detection unit.
 2. There will be overlapping points on the map and that is OK. If you want to cluster them go for it,

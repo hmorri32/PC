@@ -1,42 +1,52 @@
 #root {
-  max-width: 1280px;
   margin: 0 auto;
+  max-width: 1280px;
   padding: 2rem;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.control-wrapper {
+  background-color: rgba(70, 70, 70, 0.5);
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  z-index: 2;
+  width: 21%;
+  left: 10px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.buffer-controls {
+  top: 68px;
 }
 
-.card {
-  padding: 2em;
+.buffer-form {
+  display: flex;
+  flex-direction: column;
 }
 
-.read-the-docs {
-  color: #888;
+.buffer-form button {
+  margin: 5px;
+  padding: 0.4em 1.2em;
+}
+
+.gas-controls {
+  top: 10px;
+}
+
+.control-input {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 1em;
+  margin: 5px;
+  padding: 0.4em 1.2em;
+  padding: 5px;
+}
+
+.gas-controls label {
+  align-self: start;
+  font-size: 1em;
+  font-weight: 600;
+  margin: 5px;
 }
