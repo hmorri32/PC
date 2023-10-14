@@ -1,11 +1,24 @@
 import arrow from '../assets/triangle.svg';
-import PropTypes from 'prop-types';
-import './controls.css';
+import './Controls.css';
 
-export const Controls = ({ mapLayers, handleClick }) => {
+interface MapLayer {
+  type: string;
+  img: string;
+  url: string;
+}
+
+interface StyleControlsProps {
+  mapLayers: MapLayer[];
+  handleClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+}
+
+export const StyleControls = ({
+  mapLayers,
+  handleClick,
+}: StyleControlsProps) => {
   return (
     <aside className="controls" onClick={handleClick}>
-      {mapLayers.map((layer, i) => (
+      {mapLayers.map((layer: MapLayer, i: number) => (
         <div key={i} className="map-toggle-wrap" data-type={layer.type}>
           <span className="map-type" data-type={layer.type}>
             {layer.type}
@@ -22,9 +35,4 @@ export const Controls = ({ mapLayers, handleClick }) => {
       ))}
     </aside>
   );
-};
-
-Controls.propTypes = {
-  mapLayers: PropTypes.array.isRequired,
-  handleClick: PropTypes.func.isRequired,
 };

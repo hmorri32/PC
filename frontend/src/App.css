@@ -44,6 +44,11 @@
   padding: 5px;
 }
 
+.control-input:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
 .gas-controls label {
   align-self: start;
   font-size: 1em;

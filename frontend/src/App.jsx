@@ -1,21 +1,22 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import Map, {
-  Layer,
-  Marker,
-  NavigationControl,
-  Popup,
-  Source,
-} from 'react-map-gl';
+import { useEffect, useMemo, useState } from 'react';
+import Map, { NavigationControl } from 'react-map-gl';
 
 import * as turf from '@turf/turf';
 
-import { Controls } from './components/Controls';
+import { BufferControls } from './components/BufferControls';
+import { Buffers } from './components/Buffers';
+import { GasControls } from './components/GasControls';
+import { GasDetailsPopup } from './components/GasDetailsPopup';
+import { LocationPoints } from './components/LocationPoints';
+import { Modal } from './components/Modal';
+import { StyleControls } from './components/StyleControls';
+import { Terrain } from './components/Terrain';
 
-import satellite from './assets/satellite.svg';
 import globe from './assets/globe.svg';
 import moon from './assets/moon.svg';
-import road from './assets/road.svg';
 import mountain from './assets/snow.svg';
+import road from './assets/road.svg';
+import satellite from './assets/satellite.svg';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './App.css';
@@ -55,21 +56,45 @@ function App() {
   const [bufferData, setBufferData] = useState();
   const [selectedGas, setSelectedGas] = useState('Ch4');
   const [popupInfo, setPopupInfo] = useState(null);
+  const [geoJSONFeatures, setGeoJSONFeatures] = useState([]);
+  const [modalData, setModalData] = useState(null);
 
-  const bufferGeoJSON = bufferData ? turf.featureCollection(bufferData) : null;
+  const postBufferData = (e) => {
+    e.preventDefault();
+
+    fetch(
+      `http://localhost:3000/api/v1/geojson/${geoJSONFeatures[0].id}/buffer-geom`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bufferData),
+      },
+    )
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((data) => {
+            throw new Error(`Request failed: ${data.error}`);
+          });
+        }
+        return response.json();
+      })
+      .then((json) => {
+        setModalData({
+          message: json.message,
+        });
+      })
+      .catch((error) => {
+        setModalData(error);
+      });
+  };
 
   const handleSetBuffer = (e) => {
     e.preventDefault();
 
     if (bufferSize > 0) {
       setBufferData(
-        geolocationData.map((point) => {
-          const turfPoint = turf.point([
-            Number(point.Longitude),
-            Number(point.Latitude),
-          ]);
-
-          return turf.buffer(turfPoint, bufferSize, { units: 'meters' });
+        turf.buffer(geoJSONFeatures[0].geojson_feature, bufferSize, {
+          units: 'meters',
         }),
       );
     } else {
@@ -77,33 +102,53 @@ function App() {
     }
   };
 
-  const geolocationDataToGeoJSON = useMemo(() => {
-    return {
-      type: 'FeatureCollection',
-      features: geolocationData.map((point) => {
-        return {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [point.Longitude, point.Latitude],
-          },
-          properties: {
-            id: point.id,
-            TimeStamp: point.TimeStamp,
-            Ch4: point.Ch4,
-            C2H6: point.C2H6,
-          },
-        };
-      }),
+  // const geolocationDataToGeoJSON = useMemo(() => {
+  //   return {
+  //     type: 'FeatureCollection',
+  //     features: geolocationData.map((point) => {
+  //       return {
+  //         type: 'Feature',
+  //         geometry: {
+  //           type: 'Point',
+  //           coordinates: [point.Longitude, point.Latitude],
+  //         },
+  //         properties: {
+  //           id: point.id,
+  //           TimeStamp: point.TimeStamp,
+  //           Ch4: point.Ch4,
+  //           C2H6: point.C2H6,
+  //         },
+  //       };
+  //     }),
+  //   };
+  // }, [geolocationData]);
+
+  useEffect(() => {
+    let ignore = false;
+    const fetchGeoJSON = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/v1/geojson');
+        const geojson = await response.json();
+
+        if (!ignore) {
+          setGeoJSONFeatures(geojson);
+        }
+      } catch (e) {
+        setModalData(e);
+      }
     };
-  }, [geolocationData]);
+
+    fetchGeoJSON();
+
+    return () => (ignore = true);
+  }, []);
 
   useEffect(() => {
     let ignore = false;
     const fetchGeolocationData = async () => {
       try {
         const response = await fetch(
-          'http://localhost:3000/api/v1/geolocationData',
+          'http://localhost:3000/api/v1/geolocation-data',
         );
 
         const geolocationData = await response.json();
@@ -129,62 +174,6 @@ function App() {
     setMapStyle(newStyle);
   };
 
-  const memoizedMarkers = useMemo(() => {
-    return geolocationData.map((point) => (
-      <Marker
-        key={point.id}
-        latitude={point.Latitude}
-        longitude={point.Longitude}
-      >
-        {/* <div
-          style={{
-            height: '10px',
-            width: '10px',
-            backgroundColor: 'green',
-            borderRadius: '50%',
-          }}
-        /> */}
-      </Marker>
-    ));
-  }, [geolocationData]);
-
-  const dataLayer = {
-    id: 'point',
-    type: 'circle',
-    paint: {
-      'circle-color':
-        selectedGas === 'Ch4'
-          ? [
-              'interpolate',
-              ['linear'],
-              ['get', 'Ch4'],
-              2.1,
-              '#2ecc71',
-              2.4,
-              '#f39c12',
-              2.5,
-              '#e74c3c',
-              5,
-              '#e74c3c',
-            ]
-          : [
-              'interpolate',
-              ['linear'],
-              ['get', 'C2H6'],
-              0,
-              '#2ecc71',
-              15,
-              '#f39c12',
-              20,
-              '#f39c12',
-              30,
-              '#e74c3c',
-              100,
-              '#e74c3c',
-            ],
-    },
-  };
-
   const handleMapClick = (event) => {
     const { features } = event;
 
@@ -196,102 +185,59 @@ function App() {
         clickedFeature,
       });
     }
-
-    // setSelectedFeature(
-    //   // clickedFeature ? { feature: clickedFeature, longitude, latitude } : null,
-    // );
   };
 
   return (
     <>
-      <div className="control-wrapper gas-controls">
-        {/* <label htmlFor="gas-selector">Select Gas: </label> */}
-        <select
-          className="control-input"
-          onChange={(e) => setSelectedGas(e.target.value)}
-          value={selectedGas}
-        >
-          <option value="Ch4">Methane (CH4)</option>
-          <option value="C2H6">Ethane (C2H6)</option>
-        </select>
-      </div>
-      <div className="control-wrapper buffer-controls">
-        <form className="buffer-form" onSubmit={handleSetBuffer}>
-          <input
-            type="number"
-            className="control-input"
-            placeholder="Buffer Size (meters)"
-            value={bufferSize}
-            onChange={(e) => setBufferSize(e.target.value)}
-          />
-          <button className="control-input" type="submit">
-            Set Buffer
-          </button>
-          <button className="control-input"> Save Buffers to DB</button>
-        </form>
-      </div>
+      <GasControls selectedGas={selectedGas} setSelectedGas={setSelectedGas} />
+      <BufferControls
+        disabled={!bufferData || !bufferSize}
+        bufferSize={bufferSize}
+        handleSetBuffer={handleSetBuffer}
+        setBufferSize={setBufferSize}
+        postBufferData={postBufferData}
+      />
+      <StyleControls mapLayers={MAP_LAYERS} handleClick={handleStyleChange} />
 
-      <Controls mapLayers={MAP_LAYERS} handleClick={handleStyleChange} />
+      <Modal isOpen={!!modalData} onRequestClose={() => setModalData(null)}>
+        <div>
+          <h2>{modalData && modalData.message}</h2>
+        </div>
+      </Modal>
 
       <Map
-        mapboxAccessToken={import.meta.env.VITE_MAPBOX_API_KEY}
+        asyncRender={true}
+        interactiveLayerIds={['point']}
         initialViewState={{
           latitude: 42.91401640878263,
           longitude: -84.2266095259169,
           zoom: 11,
         }}
-        interactiveLayerIds={['point']}
-        style={{ width: '100vw', height: '100vh' }}
+        mapboxAccessToken={import.meta.env.VITE_MAPBOX_API_KEY}
         mapStyle={mapStyle.url}
-        asyncRender={true}
         onClick={handleMapClick}
+        style={{ width: '100vw', height: '100vh' }}
         terrain={{ source: 'mapbox-dem', exaggeration: 1.5 }}
       >
         <NavigationControl position="top-right" />
-        <Source type="geojson" data={geolocationDataToGeoJSON}>
-          <Layer {...dataLayer} />
-        </Source>
+        <Terrain />
+        {geoJSONFeatures.length > 0 && (
+          <LocationPoints
+            geoJSONFeatures={geoJSONFeatures}
+            selectedGas={selectedGas}
+          />
+        )}
         {popupInfo && (
-          <Popup
-            longitude={popupInfo.lngLat.lng}
+          <GasDetailsPopup
             latitude={popupInfo.lngLat.lat}
-            closeButton={true}
-            closeOnClick={false}
-            onClose={() => setPopupInfo(null)}
-            anchor="top"
-          >
-            <div>
-              <h3>{selectedGas} Concentration</h3>
-              <p>
-                {`${selectedGas}: ${
-                  popupInfo.clickedFeature.properties[selectedGas]
-                } ${selectedGas === 'Ch4' ? 'ppm' : 'ppb'}`}
-              </p>
-              <p>{`Date: ${popupInfo.clickedFeature.properties.TimeStamp}`}</p>
-            </div>
-          </Popup>
+            longitude={popupInfo.lngLat.lng}
+            selectedGas={selectedGas}
+            setPopupInfo={setPopupInfo}
+            properties={popupInfo.clickedFeature.properties}
+          />
         )}
 
-        <Source // set the terrain source (extract to component)
-          id="mapbox-dem"
-          type="raster-dem"
-          url="mapbox://mapbox.mapbox-terrain-dem-v1"
-          tileSize={512}
-          maxzoom={14}
-        />
-        {bufferGeoJSON && (
-          <Source type="geojson" data={bufferGeoJSON}>
-            <Layer
-              id="buffer"
-              type="fill"
-              source="buffer"
-              paint={{
-                'fill-opacity': 0.2,
-                'fill-color': '#d4c4f3',
-              }}
-            />
-          </Source>
-        )}
+        {bufferData && <Buffers bufferData={bufferData} />}
       </Map>
     </>
   );
