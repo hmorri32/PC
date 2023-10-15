@@ -45,10 +45,27 @@ router.get('/api/v1/geolocation-data', (request, response) => {
     });
 });
 
+router.get('/api/v1/geojson/:id/buffer-geom', (request, response) => {
+  const { id } = request.params;
+
+  database('bufferData')
+    .where('geojson_id', id)
+    .select()
+    .then((bufferData) => {
+      if (bufferData.length) {
+        response.status(200).json(bufferData);
+      } else {
+        response.status(404).json({ error: 'No buffer data found' });
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      response.status(500).json({ error: `Internal Server Error: ${error}` });
+    });
+});
+
 router.post('/api/v1/geojson/:id/buffer-geom', async (request, response) => {
   try {
-    // await database('bufferData').del(); // maybe? idk. upsert? perhaps?
-
     const geojsonId = request.params.id;
     const bufferData = request.body;
     const geojson = await database('geojson').where('id', geojsonId);
@@ -57,14 +74,18 @@ router.post('/api/v1/geojson/:id/buffer-geom', async (request, response) => {
       throw new Error(`No geojson found with id: ${geojsonId}`);
     }
 
-    await database('bufferData').insert({
-      data: bufferData,
-      geojson_id: geojsonId,
-    });
+    await database('bufferData')
+      .insert({
+        data: bufferData,
+        geojson_id: geojsonId,
+      })
+      .onConflict('geojson_id') // Identify conflicting column
+      .merge(); // Use data from the incoming row during conflict
 
     response.status(201).json({
       status: 'success',
-      message: `Buffer data successfully created and associated with geojson id: ${geojsonId}!`,
+      message: `Geometry saved and associated with location data id: ${geojsonId}!`,
+      data: bufferData,
     });
   } catch (error) {
     console.error(error);
