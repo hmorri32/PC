@@ -8,14 +8,12 @@ interface BufferControlsProps {
 
 export const BufferControls = ({
   bufferSize,
-  disabled,
-  handleSetBuffer,
   setBufferSize,
   postBufferData,
 }: BufferControlsProps) => {
   return (
     <div className="control-wrapper buffer-controls">
-      <form className="buffer-form" onSubmit={handleSetBuffer}>
+      <form className="buffer-form">
         <input
           type="number"
           className="control-input"
@@ -23,11 +21,8 @@ export const BufferControls = ({
           value={bufferSize}
           onChange={(e) => setBufferSize(e.target.value)}
         />
-        <button disabled={!bufferSize} className="control-input" type="submit">
-          Set Buffer
-        </button>
         <button
-          disabled={disabled}
+          disabled={bufferSize < 1}
           onClick={(e) => postBufferData(e)}
           className="control-input"
         >

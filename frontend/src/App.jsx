@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 import Map, { NavigationControl } from 'react-map-gl';
 
 import * as turf from '@turf/turf';
@@ -11,6 +11,8 @@ import { LocationPoints } from './components/LocationPoints';
 import { Modal } from './components/Modal';
 import { StyleControls } from './components/StyleControls';
 import { Terrain } from './components/Terrain';
+
+import { useFetchBufferData, useFetchGeoJsonData } from './hooks/useFetch';
 
 import globe from './assets/globe.svg';
 import moon from './assets/moon.svg';
@@ -51,120 +53,55 @@ const MAP_LAYERS = [
 
 function App() {
   const [mapStyle, setMapStyle] = useState(MAP_LAYERS[0]);
-  const [geolocationData, setGeolocationData] = useState([]);
   const [bufferSize, setBufferSize] = useState('');
-  const [bufferData, setBufferData] = useState();
   const [selectedGas, setSelectedGas] = useState('Ch4');
-  const [popupInfo, setPopupInfo] = useState(null);
+
   const [geoJSONFeatures, setGeoJSONFeatures] = useState([]);
+  const [bufferGeoJson, setBufferGeoJson] = useState([]);
+
+  const [popupInfo, setPopupInfo] = useState(null);
   const [modalData, setModalData] = useState(null);
 
-  const postBufferData = (e) => {
+  useFetchGeoJsonData(setGeoJSONFeatures, setModalData);
+  useFetchBufferData(geoJSONFeatures, setModalData, setBufferGeoJson);
+
+  const postBufferData = async (e) => {
     e.preventDefault();
 
-    fetch(
-      `http://localhost:3000/api/v1/geojson/${geoJSONFeatures[0].id}/buffer-geom`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bufferData),
-      },
-    )
-      .then((response) => {
-        if (!response.ok) {
-          return response.json().then((data) => {
-            throw new Error(`Request failed: ${data.error}`);
-          });
-        }
-        return response.json();
-      })
-      .then((json) => {
-        setModalData({
-          message: json.message,
-        });
-      })
-      .catch((error) => {
-        setModalData(error);
-      });
-  };
+    const buffers = turf.buffer(
+      geoJSONFeatures[0].geojson_feature,
+      bufferSize,
+      { units: 'meters' },
+    );
 
-  const handleSetBuffer = (e) => {
-    e.preventDefault();
-
-    if (bufferSize > 0) {
-      setBufferData(
-        turf.buffer(geoJSONFeatures[0].geojson_feature, bufferSize, {
-          units: 'meters',
-        }),
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/v1/geojson/${geoJSONFeatures[0].id}/buffer-geom`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(buffers),
+        },
       );
-    } else {
-      setBufferData(null);
+
+      if (!response.ok) {
+        let data = await response.json();
+        throw new Error(
+          `Request failed ${response.status}: ${data.description}`,
+        );
+      }
+
+      const json = await response.json();
+
+      setBufferGeoJson(json);
+
+      setModalData({
+        message: json.message,
+      });
+    } catch (e) {
+      setModalData(e);
     }
   };
-
-  // const geolocationDataToGeoJSON = useMemo(() => {
-  //   return {
-  //     type: 'FeatureCollection',
-  //     features: geolocationData.map((point) => {
-  //       return {
-  //         type: 'Feature',
-  //         geometry: {
-  //           type: 'Point',
-  //           coordinates: [point.Longitude, point.Latitude],
-  //         },
-  //         properties: {
-  //           id: point.id,
-  //           TimeStamp: point.TimeStamp,
-  //           Ch4: point.Ch4,
-  //           C2H6: point.C2H6,
-  //         },
-  //       };
-  //     }),
-  //   };
-  // }, [geolocationData]);
-
-  useEffect(() => {
-    let ignore = false;
-    const fetchGeoJSON = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/api/v1/geojson');
-        const geojson = await response.json();
-
-        if (!ignore) {
-          setGeoJSONFeatures(geojson);
-        }
-      } catch (e) {
-        setModalData(e);
-      }
-    };
-
-    fetchGeoJSON();
-
-    return () => (ignore = true);
-  }, []);
-
-  useEffect(() => {
-    let ignore = false;
-    const fetchGeolocationData = async () => {
-      try {
-        const response = await fetch(
-          'http://localhost:3000/api/v1/geolocation-data',
-        );
-
-        const geolocationData = await response.json();
-
-        if (!ignore) {
-          setGeolocationData(geolocationData);
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    };
-
-    fetchGeolocationData();
-
-    return () => (ignore = true);
-  }, []);
 
   const handleStyleChange = (e) => {
     const elementType = e.target.getAttribute('data-type');
@@ -191,9 +128,7 @@ function App() {
     <>
       <GasControls selectedGas={selectedGas} setSelectedGas={setSelectedGas} />
       <BufferControls
-        disabled={!bufferData || !bufferSize}
         bufferSize={bufferSize}
-        handleSetBuffer={handleSetBuffer}
         setBufferSize={setBufferSize}
         postBufferData={postBufferData}
       />
@@ -211,7 +146,7 @@ function App() {
         initialViewState={{
           latitude: 42.91401640878263,
           longitude: -84.2266095259169,
-          zoom: 11,
+          zoom: 11.6,
         }}
         mapboxAccessToken={import.meta.env.VITE_MAPBOX_API_KEY}
         mapStyle={mapStyle.url}
@@ -221,7 +156,7 @@ function App() {
       >
         <NavigationControl position="top-right" />
         <Terrain />
-        {geoJSONFeatures.length > 0 && (
+        {geoJSONFeatures && geoJSONFeatures.length > 0 && (
           <LocationPoints
             geoJSONFeatures={geoJSONFeatures}
             selectedGas={selectedGas}
@@ -237,7 +172,7 @@ function App() {
           />
         )}
 
-        {bufferData && <Buffers bufferData={bufferData} />}
+        {bufferGeoJson.data && <Buffers bufferData={bufferGeoJson.data} />}
       </Map>
     </>
   );
