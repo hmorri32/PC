@@ -5,6 +5,7 @@
 exports.up = function (knex) {
   return knex.schema.createTable('buffer_geojson', (table) => {
     table.increments('id').primary();
+    table.string('timestamp')
     table.jsonb('data').notNull();
     table
       .integer('geojson_id')

@@ -1,5 +1,9 @@
 # Project Canary
 
+Find this app deployed on [Netlify](https://projcanarrrr.netlify.app/) (runs slowly, be nice to heroku postgres).
+
+Also, please note: tradeoffs were made in the interest of time! I look forward to chatting about these.
+
 ## Overview
 
 Project Canary is a mapping coding exercise that aims to plot the locations of each record in a `data.csv` file on a map and save a coverage polygon. The project consists of both a frontend and a backend.
@@ -32,7 +36,7 @@ This will be used to render the map layers.
 
 #### Configuration steps
 
-Run `npm start` in the root directory, which will concurrently install the dependencies in the frontend and backend repos and start both servers.
+Run `npm install` and then `npm start` in the root directory, which will concurrently install the dependencies in the frontend and backend repos and start both servers.
 
 Alternatively, you can run the backend and frontend servers separately in separate terminals:
 

@@ -4,7 +4,6 @@ const enviroment = process.env.NODE_ENV || 'development';
 const configuration = require('../knexfile')[enviroment];
 const database = require('knex')(configuration);
 
-
 router.get('/', (_, response) => {
   response.json({
     name: 'hugh',
@@ -56,8 +55,6 @@ router.get('/api/v1/location-geojson/:id/buffer-geom', (request, response) => {
     .where('geojson_id', id)
     .select()
     .then((bufferData) => {
-      console.log({ bufferData });
-
       response.status(200).json(bufferData);
     })
     .catch((error) => {
@@ -83,6 +80,7 @@ router.post(
         .insert({
           data: bufferData,
           geojson_id: geojsonId,
+          timestamp: database.fn.now(),
         })
         .onConflict('geojson_id')
         .merge();

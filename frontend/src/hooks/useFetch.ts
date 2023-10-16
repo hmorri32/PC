@@ -1,7 +1,7 @@
 import { FeatureCollection, Point } from 'geojson';
 import { useEffect } from 'react';
 import { apiBaseUrl } from '../fetchConfig.js'
-console.log(apiBaseUrl)
+
 interface geoJSONFeatures {
   geoJSONFeatures: FeatureCollection<Point>[];
   id: string;
