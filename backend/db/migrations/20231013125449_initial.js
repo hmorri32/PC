@@ -4,7 +4,7 @@
  */
 exports.up = function (knex) {
   // TimeStamp,Ch4,C2H6,Latitude,Longitude
-  return knex.schema.createTable('geolocationData', function (table) {
+  return knex.schema.createTable('location_data', function (table) {
     table.increments('id').primary();
     table.string('TimeStamp');
     table.float('Latitude');
@@ -21,5 +21,5 @@ exports.up = function (knex) {
  * @returns { Promise<void> }
  */
 exports.down = function (knex) {
-  return knex.schema.dropTable('geolocationData');
+  return knex.schema.dropTable('location_data');
 };

@@ -3,14 +3,14 @@
  * @returns { Promise<void> }
  */
 exports.up = function (knex) {
-  return knex.schema.createTable('bufferData', (table) => {
+  return knex.schema.createTable('buffer_geojson', (table) => {
     table.increments('id').primary();
     table.jsonb('data').notNull();
     table
       .integer('geojson_id')
       .unsigned()
       .references('id')
-      .inTable('geojson')
+      .inTable('location_geojson')
       .unique()
       .onDelete('CASCADE');
   });
@@ -21,5 +21,5 @@ exports.up = function (knex) {
  * @returns { Promise<void> }
  */
 exports.down = function (knex) {
-  return knex.schema.dropTable('bufferData');
+  return knex.schema.dropTable('buffer_geojson');
 };

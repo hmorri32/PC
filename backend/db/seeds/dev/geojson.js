@@ -4,9 +4,11 @@ const path = require('path');
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
+
+// seeds `location_geojson` with geojson jsonb column
 exports.seed = async function (knex) {
   // Deletes ALL existing entries
-  await knex('geojson').del();
+  await knex('location_geojson').del();
 
   const csvFile = fs.readFileSync(path.resolve('data/data.csv'), 'utf8');
   const rows = csvFile.split('\n').map((line) => line.replace('\r', ''));
@@ -55,13 +57,13 @@ exports.seed = async function (knex) {
     })
     .map(({ feature }) => feature);
 
-    const geoJSONData = {
+  const geoJSONData = {
     type: 'FeatureCollection',
     features: geoJSONFeatures,
   };
 
   // 3. Seed the Database
-  await knex('geojson').insert({
+  await knex('location_geojson').insert({
     geojson_feature: JSON.stringify(geoJSONData),
   });
 };

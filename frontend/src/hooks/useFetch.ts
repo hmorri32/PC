@@ -27,18 +27,20 @@ export const useFetchBufferData = ({
     const fetchAndSetBufferData = async (geojsonid: string) => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/v1/geojson/${geojsonid}/buffer-geom`,
+          `http://localhost:3000/api/v1/location-geojson/${geojsonid}/buffer-geom`,
         );
         if (!response.ok) {
           let data = await response.json();
           throw new Error(
-            `Request failed ${response.status}: ${data.description}`,
+            `Request failed ${response.status}: ${
+              data.description || data.error
+            }`,
           );
         }
 
         const bufferData = await response.json();
 
-        if (!ignore) {
+        if (!ignore && bufferData && bufferData.length > 0) {
           setBufferGeoJson(bufferData[0]);
         }
       } catch (e) {
@@ -66,8 +68,17 @@ export const useFetchGeoJsonData = ({
 
     const fetchAndSetGeoJSON = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/v1/geojson');
+        const response = await fetch(
+          'http://localhost:3000/api/v1/location-geojson',
+        );
         const geojson = await response.json();
+
+        if (!response.ok) {
+          let data = await response.json();
+          throw new Error(
+            `Request failed ${response.status}: ${data.description}`,
+          );
+        }
 
         if (!ignore) {
           setGeoJSONFeatures(geojson);

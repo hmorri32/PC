@@ -25,14 +25,14 @@ import './App.css';
 
 const MAP_LAYERS = [
   {
-    type: 'Light',
-    url: 'mapbox://styles/mapbox/light-v10?optimize=true',
-    img: globe,
-  },
-  {
     type: 'Dark',
     url: 'mapbox://styles/mapbox/dark-v10?optimize=true',
     img: moon,
+  },
+  {
+    type: 'Light',
+    url: 'mapbox://styles/mapbox/light-v10?optimize=true',
+    img: globe,
   },
   {
     type: 'Street',
@@ -76,7 +76,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/v1/geojson/${geoJSONFeatures[0].id}/buffer-geom`,
+        `http://localhost:3000/api/v1/location-geojson/${geoJSONFeatures[0].id}/buffer-geom`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

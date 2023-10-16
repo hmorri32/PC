@@ -3,7 +3,7 @@
  * @returns { Promise<void> }
  */
 exports.up = function (knex) {
-  return knex.schema.createTable('geojson', function (table) {
+  return knex.schema.createTable('location_geojson', function (table) {
     table.increments('id').primary();
     table.jsonb('geojson_feature');
   });
@@ -14,5 +14,5 @@ exports.up = function (knex) {
  * @returns { Promise<void> }
  */
 exports.down = function (knex) {
-  return knex.schema.dropTable('geojson');
+  return knex.schema.dropTable('location_geojson');
 };

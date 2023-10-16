@@ -5,8 +5,10 @@ const path = require('path');
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
+
+// seeds "traditional" pg database with data from csv file
 exports.seed = async function (knex) {
-  await knex('geolocationData').del();
+  await knex('location_data').del();
 
   const csvFile = fs.readFileSync(path.resolve('data/data.csv'), 'utf8');
   const rows = csvFile.split('\n').map((line) => line.replace('\r', ''));
@@ -28,8 +30,6 @@ exports.seed = async function (knex) {
     return rowData;
   });
 
-  console.log(insertData);
-
   // Insert parsed data into database
-  await knex('geolocationData').insert(insertData);
+  await knex('location_data').insert(insertData);
 };
