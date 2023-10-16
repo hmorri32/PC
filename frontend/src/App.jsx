@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Map, { NavigationControl } from 'react-map-gl';
+
 import { apiBaseUrl } from './fetchConfig.js';
 import * as turf from '@turf/turf';
 

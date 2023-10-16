@@ -1,5 +1,5 @@
 import arrow from '../assets/triangle.svg';
-import './Controls.css';
+import './controls.css';
 
 interface MapLayer {
   type: string;
