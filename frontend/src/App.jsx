@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Map, { NavigationControl } from 'react-map-gl';
-
+import { apiBaseUrl } from './fetchConfig.js';
 import * as turf from '@turf/turf';
 
 import { BufferControls } from './components/BufferControls';
@@ -76,7 +76,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/v1/location-geojson/${geoJSONFeatures[0].id}/buffer-geom`,
+        `${apiBaseUrl}/api/v1/location-geojson/${geoJSONFeatures[0].id}/buffer-geom`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build": "vite build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@turf/turf": "^6.5.0",
@@ -31,5 +33,5 @@
     "eslint-plugin-react-refresh": "^0.4.3",
     "vite": "^4.4.5"
   },
-  "proxy": "http://localhost:3000"
+  "homepage": "https://github.com/hmorri32/project-canary"
 }

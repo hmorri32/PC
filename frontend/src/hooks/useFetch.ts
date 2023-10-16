@@ -1,6 +1,7 @@
 import { FeatureCollection, Point } from 'geojson';
 import { useEffect } from 'react';
-
+import { apiBaseUrl } from '../fetchConfig.js'
+console.log(apiBaseUrl)
 interface geoJSONFeatures {
   geoJSONFeatures: FeatureCollection<Point>[];
   id: string;
@@ -27,7 +28,7 @@ export const useFetchBufferData = ({
     const fetchAndSetBufferData = async (geojsonid: string) => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/v1/location-geojson/${geojsonid}/buffer-geom`,
+          `${apiBaseUrl}/api/v1/location-geojson/${geojsonid}/buffer-geom`,
         );
         if (!response.ok) {
           let data = await response.json();
@@ -68,9 +69,7 @@ export const useFetchGeoJsonData = ({
 
     const fetchAndSetGeoJSON = async () => {
       try {
-        const response = await fetch(
-          'http://localhost:3000/api/v1/location-geojson',
-        );
+        const response = await fetch(`${apiBaseUrl}/api/v1/location-geojson`);
         const geojson = await response.json();
 
         if (!response.ok) {

@@ -4,6 +4,7 @@ const enviroment = process.env.NODE_ENV || 'development';
 const configuration = require('../knexfile')[enviroment];
 const database = require('knex')(configuration);
 
+
 router.get('/', (_, response) => {
   response.json({
     name: 'hugh',
@@ -12,8 +13,7 @@ router.get('/', (_, response) => {
 });
 
 // serves geojson formatted data from csv
-// worthwhile exploration as rendering geojson is much faster than
-// looping over json and rendering markers
+// renderin a ggeojson layer is much faster than looping over json and rendering markers
 // and is faster than converting json to geojson client side.
 router.get('/api/v1/location-geojson', (request, response) => {
   database('location_geojson')
@@ -32,7 +32,10 @@ router.get('/api/v1/location-geojson', (request, response) => {
 });
 
 // serves json from csv
-// downsides: have to map over data to render markers || have to format as geojson client sides
+// downsides: have to map over data to render markers
+// or have to format as geojson client side
+// both of which are slow with the amount of data we have.
+// note: not currently used in the frontend.
 router.get('/api/v1/location-data', (request, response) => {
   database('location_data')
     .select()
@@ -45,6 +48,7 @@ router.get('/api/v1/location-data', (request, response) => {
     });
 });
 
+// serves buffer geometry that's associated with a geojson id
 router.get('/api/v1/location-geojson/:id/buffer-geom', (request, response) => {
   const { id } = request.params;
 
@@ -62,6 +66,7 @@ router.get('/api/v1/location-geojson/:id/buffer-geom', (request, response) => {
     });
 });
 
+// effectively an upsert
 router.post(
   '/api/v1/location-geojson/:id/buffer-geom',
   async (request, response) => {
@@ -79,10 +84,10 @@ router.post(
           data: bufferData,
           geojson_id: geojsonId,
         })
-        .onConflict('geojson_id') // Identify conflicting column
-        .merge(); // Use data from the incoming row during conflict
+        .onConflict('geojson_id')
+        .merge();
 
-      response.status(201).json({
+      response.status(200).json({
         status: 'success',
         message: `Geometry saved and associated with location data id: ${geojsonId}!`,
         data: bufferData,

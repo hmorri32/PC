@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "concurrently \"cd frontend && npm install && npm run dev\" \"cd backend && npm install && npm start\""
+    "start": "concurrently \"cd frontend && npm install && npm run dev\" \"cd backend && npm install && npm run start-dev\""
   },
   "repository": {
     "type": "git",
@@ -16,8 +16,12 @@
   "bugs": {
     "url": "https://github.com/hmorri32/project-canary/issues"
   },
-  "homepage": "https://github.com/hmorri32/project-canary#readme",
+  "homepage": "https://github.com/hmorri32/project-canary",
   "devDependencies": {
-    "concurrently": "^8.2.1"
+    "concurrently": "^8.2.1",
+    "gh-pages": "^6.0.0"
+  },
+  "dependencies": {
+    "heroku": "^8.5.0"
   }
 }
