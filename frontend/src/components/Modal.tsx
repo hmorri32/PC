@@ -3,7 +3,13 @@ import './Modal.css';
 
 ReactModal.setAppElement('#root');
 
-export const Modal = ({ children, isOpen, onRequestClose }) => {
+interface ModalProps {
+  children: React.ReactNode;
+  isOpen: boolean;
+  onRequestClose: () => void;
+}
+
+export const Modal = ({ children, isOpen, onRequestClose }: ModalProps) => {
   return (
     <ReactModal
       isOpen={isOpen}

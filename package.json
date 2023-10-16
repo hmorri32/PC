@@ -18,8 +18,7 @@
   },
   "homepage": "https://github.com/hmorri32/project-canary",
   "devDependencies": {
-    "concurrently": "^8.2.1",
-    "gh-pages": "^6.0.0"
+    "concurrently": "^8.2.1"
   },
   "dependencies": {
     "heroku": "^8.5.0"
