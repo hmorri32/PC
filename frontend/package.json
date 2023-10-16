@@ -19,6 +19,7 @@
     "react-modal": "^3.16.1"
   },
   "devDependencies": {
+    "@types/turf": "^3.5.32",
     "@types/geojson": "^7946.0.11",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",

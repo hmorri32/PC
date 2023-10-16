@@ -53,7 +53,7 @@ const MAP_LAYERS = [
 
 function App() {
   const [mapStyle, setMapStyle] = useState(MAP_LAYERS[0]);
-  const [bufferSize, setBufferSize] = useState('');
+  const [bufferSize, setBufferSize] = useState(0);
   const [selectedGas, setSelectedGas] = useState('Ch4');
 
   const [geoJSONFeatures, setGeoJSONFeatures] = useState([]);
@@ -62,8 +62,8 @@ function App() {
   const [popupInfo, setPopupInfo] = useState(null);
   const [modalData, setModalData] = useState(null);
 
-  useFetchGeoJsonData(setGeoJSONFeatures, setModalData);
-  useFetchBufferData(geoJSONFeatures, setModalData, setBufferGeoJson);
+  useFetchGeoJsonData({ setGeoJSONFeatures, setModalData });
+  useFetchBufferData({ geoJSONFeatures, setModalData, setBufferGeoJson });
 
   const postBufferData = async (e) => {
     e.preventDefault();
@@ -95,9 +95,7 @@ function App() {
 
       setBufferGeoJson(json);
 
-      setModalData({
-        message: json.message,
-      });
+      setModalData({ message: json.message });
     } catch (e) {
       setModalData(e);
     }
@@ -108,7 +106,9 @@ function App() {
 
     const newStyle = MAP_LAYERS.find((style) => style.type === elementType);
 
-    setMapStyle(newStyle);
+    if (newStyle) {
+      setMapStyle(newStyle);
+    }
   };
 
   const handleMapClick = (event) => {
@@ -141,7 +141,6 @@ function App() {
       </Modal>
 
       <Map
-        asyncRender={true}
         interactiveLayerIds={['point']}
         initialViewState={{
           latitude: 42.91401640878263,

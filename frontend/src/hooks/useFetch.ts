@@ -1,13 +1,30 @@
+import { FeatureCollection, Point } from 'geojson';
 import { useEffect } from 'react';
 
-export const useFetchBufferData = (
+interface geoJSONFeatures {
+  geoJSONFeatures: FeatureCollection<Point>[];
+  id: string;
+}
+
+interface useFetchGeoJsonDataProps {
+  setModalData: (data: any) => void;
+  setGeoJSONFeatures: (data: any) => void;
+}
+
+interface useFetchBufferDataProps {
+  geoJSONFeatures: geoJSONFeatures[];
+  setModalData: (data: any) => void;
+  setBufferGeoJson: (data: any) => void;
+}
+
+export const useFetchBufferData = ({
   geoJSONFeatures,
   setModalData,
-  setBufferData,
-) => {
+  setBufferGeoJson,
+}: useFetchBufferDataProps) => {
   useEffect(() => {
     let ignore = false;
-    const fetchAndSetBufferData = async (geojsonid) => {
+    const fetchAndSetBufferData = async (geojsonid: string) => {
       try {
         const response = await fetch(
           `http://localhost:3000/api/v1/geojson/${geojsonid}/buffer-geom`,
@@ -22,7 +39,7 @@ export const useFetchBufferData = (
         const bufferData = await response.json();
 
         if (!ignore) {
-          setBufferData(bufferData[0]);
+          setBufferGeoJson(bufferData[0]);
         }
       } catch (e) {
         console.log(e);
@@ -34,11 +51,16 @@ export const useFetchBufferData = (
       fetchAndSetBufferData(geoJSONFeatures[0].id);
     }
 
-    return () => (ignore = true);
-  }, [geoJSONFeatures, setModalData, setBufferData]);
+    return () => {
+      ignore = true;
+    };
+  }, [geoJSONFeatures, setModalData, setBufferGeoJson]);
 };
 
-export const useFetchGeoJsonData = (setGeoJSONFeatures, setModalData) => {
+export const useFetchGeoJsonData = ({
+  setGeoJSONFeatures,
+  setModalData,
+}: useFetchGeoJsonDataProps) => {
   useEffect(() => {
     let ignore = false;
 
@@ -57,6 +79,8 @@ export const useFetchGeoJsonData = (setGeoJSONFeatures, setModalData) => {
 
     fetchAndSetGeoJSON();
 
-    return () => (ignore = true);
+    return () => {
+      ignore = true;
+    };
   }, [setGeoJSONFeatures, setModalData]);
 };

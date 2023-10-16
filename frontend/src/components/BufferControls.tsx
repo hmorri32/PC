@@ -2,7 +2,7 @@ interface BufferControlsProps {
   bufferSize: number;
   disabled: boolean;
   handleSetBuffer: (e: React.FormEvent<HTMLFormElement>) => void;
-  setBufferSize: (size: string) => void;
+  setBufferSize: (size: number) => void;
   postBufferData: (e: React.MouseEvent) => void;
 }
 
