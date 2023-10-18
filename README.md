@@ -56,8 +56,8 @@ Alternatively, you can run the backend and frontend servers separately in separa
 
 The backend is written in Node.js and uses Express for the server. For a database it uses Postgres with PostGIS and Knex as an ORM.
 
-
 #### A few notes on DB setup:
+
 We'll have to migrate and seed the database using `knex` cli commands like so:
 
 `knex migrate:latest`
@@ -93,3 +93,6 @@ The frontend is built using React, TypeScript, and Vite.
 - Save the geometry to a database table with a timestamp, buffer size, and geom column.
 
 [View Full Requirements](https://github.com/hmorri32/project-canary/blob/main/REQUIREMENTS.md)
+
+### Screenshots
+![scrnshot](https://raw.githubusercontent.com/hmorri32/project-canary/main/frontend/src/assets/Screenshot%202023-10-18%20at%205.55.34%20PM.png)
